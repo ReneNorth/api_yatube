@@ -7,8 +7,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('text', 'pub_date', 'author', 'group', 'id', 'comments')
-        read_only_fields = ('author',)
+        fields = ('id', 'text', 'author', 'image', 'group', 'pub_date')
+        read_only_fields = ('author', 'pub_date', 'author', 'id')
         extra_kwargs = {'slug': {'required': True}, 'text': {'required': True}}
 
 
@@ -17,16 +17,17 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'slug', 'title', 'description')
+        read_only_fields = ('id',)
         extra_kwargs = {'slug': {'required': True}}
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentsSerializer(serializers.ModelSerializer):
     post = serializers.PrimaryKeyRelatedField(many=False,
                                               queryset=Post.objects.all())
     author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('text', 'created', 'author', 'post', 'id')
+        fields = ('id', 'author', 'post', 'text', 'created')
         read_only_fields = ('author',)
-        extra_kwargs = {'text': {'required': True}, 'post': {'required': True}}
+        extra_kwargs = {'text': {'required': True}}

@@ -1,21 +1,17 @@
-import requests
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from posts.models import Comment, Group, Post
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from .serializers import CommentSerializer, GroupSerializer, PostSerializer
+from .serializers import CommentsSerializer, GroupSerializer, PostSerializer
 
 
-# создать / получить лист постов
 class CreateRetrieveListViewSet(mixins.CreateModelMixin,
                                 mixins.ListModelMixin,
                                 viewsets.GenericViewSet):
     pass
 
 
-# получить объект или лист объектов (для групп)
 class RetrieveDeleteUpdateViewSet(mixins.RetrieveModelMixin,
                                   mixins.DestroyModelMixin,
                                   mixins.UpdateModelMixin,
@@ -23,7 +19,6 @@ class RetrieveDeleteUpdateViewSet(mixins.RetrieveModelMixin,
     pass
 
 
-# получить редактировать или удалить
 class RetrieveViewSet(mixins.RetrieveModelMixin,
                       mixins.ListModelMixin,
                       viewsets.GenericViewSet):
@@ -43,7 +38,6 @@ class LightGroupViewSet(RetrieveViewSet):
     serializer_class = GroupSerializer
 
 
-#  перенести queryset из функций в класс
 class RetrieveDeleteUpdatePostViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk):
@@ -88,30 +82,35 @@ class RetrieveDeleteUpdatePostViewSet(viewsets.ViewSet):
 
 
 class CommentsViewSet(viewsets.ViewSet):
+
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    serializer_class = CommentsSerializer
 
     def list(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
         queryset = Comment.objects.filter(post_id=post.id)
-        serializer = CommentSerializer(queryset, many=True)
+        serializer = CommentsSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, pk):
-        serializer = CommentSerializer(data=request.data)
+        post_id = self.kwargs.get('pk')
+        serializer = CommentsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(author=request.user)
+            self.request.data._mutable = True
+            self.request.data['post'] = post_id
+            self.request.data._mutable = False
+            serializer.save(author=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentsRetDelPatchViewSet(viewsets.ViewSet):
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    serializer_class = CommentsSerializer
 
     def retrieve(self, request, id, pk):
         comment = get_object_or_404(self.queryset, id=id)
-        serializer = CommentSerializer(comment)
+        serializer = CommentsSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, id, pk):
@@ -123,9 +122,9 @@ class CommentsRetDelPatchViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, id, pk):
         comment = get_object_or_404(self.queryset, id=id)
-        serializer = CommentSerializer(comment,
-                                       data=request.data,
-                                       partial=True)
+        serializer = CommentsSerializer(comment,
+                                        data=request.data,
+                                        partial=True)
         if request.user == comment.author:
             if serializer.is_valid():
                 serializer.save()
