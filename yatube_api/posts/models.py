@@ -23,10 +23,10 @@ class Post(models.Model):
     )
     image = models.ImageField(
         upload_to='posts/', null=True, blank=True
-    )  # поле для картинки
+    )
     group = models.ForeignKey(
         Group, on_delete=models.CASCADE,
-        related_name="posts", blank=True, null=True
+        related_name='posts', blank=True, null=True
     )
 
     def __str__(self):
@@ -46,4 +46,4 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return f'{self.text}'
+        return self.text

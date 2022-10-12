@@ -25,7 +25,8 @@ class GroupSerializer(serializers.ModelSerializer):
 class CommentsSerializer(serializers.ModelSerializer):
     post = serializers.PrimaryKeyRelatedField(many=False,
                                               queryset=Post.objects.all())
-    author = serializers.StringRelatedField(read_only=True)
+    author = serializers.SlugRelatedField(read_only=True,
+                                          slug_field='username')
 
     class Meta:
         model = Comment

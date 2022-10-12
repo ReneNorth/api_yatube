@@ -1,4 +1,4 @@
-from api.views import (CommentsRetDelPatchViewSet, CommentsViewSet,
+from api.views import (CommentsRetDelPatchViewSet, CommentsRetDelPatchViewSet,
                        CreateRetrieveListPostViewSet, LightGroupViewSet,
                        RetrieveDeleteUpdatePostViewSet)
 from django.conf import settings
@@ -12,10 +12,14 @@ router = DefaultRouter()
 
 router.register('posts', CreateRetrieveListPostViewSet)
 router.register('groups', LightGroupViewSet)
+# router.register(r'comments',
+#                 CommentsRetDelPatchViewSet,
+#                 basename='CommentsRetDelPatchViewSet')
 router.register(
-    r'posts/(?P<pk>\d+)/comments',
-    CommentsViewSet,
-    basename='CommentsViewSet')
+    r'posts/(?P<id>\d+)/comments',
+    # r'posts/(?P<pk>\d+)/comments',
+    CommentsRetDelPatchViewSet,
+    basename='123')
 router.register(
     r'posts',
     RetrieveDeleteUpdatePostViewSet,
@@ -23,12 +27,12 @@ router.register(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/posts/<int:pk>/comments/<int:id>/',
-         CommentsRetDelPatchViewSet.as_view(
-             {'get': 'retrieve',
-              'delete': 'destroy',
-              'patch': 'partial_update'}
-         )),
+    # path('api/v1/posts/<int:pk>/comments/<int:id>/',
+    #      CommentsRetDelPatchViewSet.as_view(
+    #          {'get': 'retrieve',
+    #           'delete': 'destroy',
+    #           'patch': 'partial_update'}
+    #      )),
     path('api/v1/api-token-auth/', views.obtain_auth_token),
     path('api/v1/', include(router.urls)),
 ]
