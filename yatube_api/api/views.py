@@ -80,71 +80,12 @@ class CommentsRetDelPatchViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
     permission_classes = [CommentsPermission, ]
 
-    def perform_create(self, request):
-        post_id = self.kwargs.get('id')
-        serializer = CommentsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(author=self.request.user)
-            print(self.request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+    def perform_create(self, serializer):
+        post = get_object_or_404(Post, id=self.kwargs.get('id'))
+        serializer.save(author=self.request.user, post=post)
+
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('id'))
         self.check_object_permissions(self.request, post)
         self.queryset = Comment.objects.filter(post_id=post.id)
         return self.queryset
-
-
-# class CommentsViewSet(viewsets.ViewSet):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentsSerializer
-
-#     def list(self, request, pk):
-#         post = get_object_or_404(Post, pk=pk)
-#         queryset = Comment.objects.filter(post_id=post.id)
-#         serializer = CommentsSerializer(queryset, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-#     def create(self, request, pk):
-#         post_id = self.kwargs.get('pk')
-#         serializer = CommentsSerializer(data=request.data)
-#         if serializer.is_valid():
-#             self.request.data._mutable = True
-#             self.request.data['post'] = post_id
-#             self.request.data._mutable = False
-#             serializer.save(author=self.request.user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-# class CommentsRetDelPatchViewSet(viewsets.ViewSet):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentsSerializer
-#     permission_classes = [AuthorOrReadOnly, ]
-
-#     def retrieve(self, request, id, pk):
-#         comment = get_object_or_404(self.queryset, id=id)
-#         self.check_object_permissions(request, comment)
-#         serializer = CommentsSerializer(comment)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-#     def destroy(self, request, id, pk):
-#         comment = get_object_or_404(self.queryset, id=id)
-#         self.check_object_permissions(request, comment)
-#         comment.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-
-#     def partial_update(self, request, id, pk):
-#         comment = get_object_or_404(self.queryset, id=id)
-#         serializer = CommentsSerializer(comment,
-#                                         data=request.data,
-#                                         partial=True)
-#         self.check_object_permissions(request, comment)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data,
-#                             status=status.HTTP_200_OK)
-#         return Response(serializer.errors,
-#                         status=status.HTTP_400_BAD_REQUEST)

@@ -17,13 +17,10 @@ router.register('groups', LightGroupViewSet)
 #                 basename='CommentsRetDelPatchViewSet')
 router.register(
     r'posts/(?P<id>\d+)/comments',
-    # r'posts/(?P<pk>\d+)/comments',
-    CommentsRetDelPatchViewSet,
-    basename='123')
+    CommentsRetDelPatchViewSet)
 router.register(
     r'posts',
-    RetrieveDeleteUpdatePostViewSet,
-    basename='RetrieveDeleteUpdatePostViewSet')
+    RetrieveDeleteUpdatePostViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
