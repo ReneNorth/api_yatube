@@ -1,17 +1,15 @@
-from api.views import (CommentsRetDelPatchViewSet,
-                       CreateRetrieveListPostViewSet,
-                       LightGroupViewSet,
+from api.views import (CommentsRetDelPatchViewSet, LightGroupViewSet,
                        RetrieveDeleteUpdatePostViewSet)
-
-from rest_framework.routers import DefaultRouter
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
-router.register(r'posts', CreateRetrieveListPostViewSet)
-router.register(r'groups', LightGroupViewSet)
-router.register(r'posts', RetrieveDeleteUpdatePostViewSet)
-router.register(r'posts/(?P<id>\d+)/comments', CommentsRetDelPatchViewSet)
+router.register('posts', RetrieveDeleteUpdatePostViewSet)
+router.register('groups', LightGroupViewSet)
+router.register(r'posts/(?P<id>\d+)/comments',
+                CommentsRetDelPatchViewSet,
+                basename='comments')
 
 urlpatterns = [
     path('', include(router.urls))

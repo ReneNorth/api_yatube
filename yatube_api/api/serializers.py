@@ -31,5 +31,5 @@ class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'author', 'post', 'text', 'created')
-        read_only_fields = ('author',)
+        read_only_fields = ('author', 'post')
         extra_kwargs = {'text': {'required': True}}
