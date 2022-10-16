@@ -12,5 +12,5 @@ router.register(r'posts/(?P<id>\d+)/comments',
                 basename='comments')
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('api/v1/', include(router.urls))
 ]
